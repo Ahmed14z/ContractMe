@@ -20,11 +20,13 @@ export class ApiService {
 
   send(data: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    console.log(data);
     return this.http.post('https://contractgptbackend-production.up.railway.app/chat', JSON.stringify(data), { headers});
   } 
 
   sign(data: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
     return this.http.post('https://contractgptbackend-production.up.railway.app/drop', JSON.stringify(data), { headers});
   }
 
@@ -49,7 +51,9 @@ export class ApiService {
   }
 
   internet(data: any): Observable<any> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    var headers = new HttpHeaders({'Content-Type':'application/json'});
+
+    console.log(data);
     return this.http.post('https://contractgptbackend-production.up.railway.app/chat-internet', JSON.stringify(data), { headers});
   }
 }

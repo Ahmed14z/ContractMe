@@ -60,6 +60,7 @@ export class HomeComponent implements AfterViewInit {
     });
   }
 
+
   spellIsTyping: boolean = false;
   riskIsTyping: boolean = false;
   risktext!: string;
@@ -196,6 +197,11 @@ export class HomeComponent implements AfterViewInit {
   //   this.currentChat = chat;
   // }
 
+  formatResponse(response: string): string {
+    // Use a regular expression to find text between ** **
+    return response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  }
+
   internetToggle() {
     this.internetMode = !this.internetMode;
   }
@@ -236,6 +242,8 @@ export class HomeComponent implements AfterViewInit {
     this.aiRes = chat.response;
     this.currentChat = chat;
     this.newc = false;
+    
+
     // Make a new class to make the current chat looks like the chat we clicked on
   }
 
@@ -272,7 +280,9 @@ export class HomeComponent implements AfterViewInit {
       response: word,
     })
       .subscribe((response: any) => {
-        this.toggleEdit();
+        if (this.editMode) {
+          this.toggleEdit();
+        }
       });
   }
 
@@ -295,14 +305,16 @@ export class HomeComponent implements AfterViewInit {
 
     this.dataReq.prompt = this.value;
     this.dataReq.conversationId = idd;
-    console.log(idd);
+    this.dataReq.googleId = this.googleId;
+
+    
     if (this.value != "\n") {
       if (this.value != "") {
 
         if (!this.internetMode) {
           this.apiServe.send(this.dataReq).subscribe((response: any) => {
             console.log(response);
-  
+            console.log('/chat');
             this.currentChat.id = idd;
   
             this.updateChat(response.response);
@@ -319,7 +331,7 @@ export class HomeComponent implements AfterViewInit {
         else {
           this.apiServe.internet(this.dataReq).subscribe((response: any) => {
             console.log(response);
-  
+            console.log(this.dataReq);
             this.currentChat.id = idd;
   
             this.updateChat(response.response);

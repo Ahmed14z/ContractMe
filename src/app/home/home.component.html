@@ -15,7 +15,13 @@
         <ul>
           <div *ngFor="let chatMessage of wholeChat; let isLast = last; let isFirst = first;"> 
 
-            <li *ngIf="chatMessage.response" (click)="changeConv(chatMessage)">{{chatMessage.response}}</li>
+            <li *ngIf="chatMessage.response" (click)="changeConv(chatMessage)"
+              [innerHTML]="formatResponse(chatMessage.response)" 
+              [ngStyle]="{ 'background-color': (this.currentChat.id === chatMessage.id) ? 'var(--outgoing-chat-bg)' : 'rgb(12, 13, 18)' }">
+              <span  class="material-symbols-rounded">
+                <mat-icon>delete_forever</mat-icon>
+              </span>
+            </li>
           </div>
         </ul>
       </div>
@@ -128,7 +134,8 @@
             </div>
           </div>
         </div>
-    
+      <!-- <div [innerHTML]="formatResponse(this.aiRes)"></div> -->
+
         <div class="chat incoming" *ngIf="!botIsTyping">
           
           <div class="chat-content">
@@ -136,7 +143,8 @@
             <div class="chat-details">
               <!-- <img src="../../assets/chatbot.jpg" alt="openAi-logo" > -->
               <div id="aiRes">
-                <p *ngIf="!this.editMode">{{this.aiRes}}</p><br>
+              
+                <p *ngIf="!this.editMode" [innerHTML]="formatResponse(this.aiRes)"></p><br>
               </div>
 
               <div id="options" class="x">
@@ -169,7 +177,7 @@
 
 
         <div *ngIf="spellflag">
-          <div class="chat incoming" *ngIf="spellIsTyping">
+          <div class="chat outgoing" *ngIf="spellIsTyping">
             <div class="chat-content">
               <div class="chat-details">
                 <!-- <img src="../../assets/chatbot.jpg" alt="openAi-logo"> -->
@@ -186,7 +194,7 @@
             <div class="chat-content">
   
               <div class="chat-details">
-                <p>{{this.spelltext}}</p>
+                <p [innerHTML]="formatResponse(this.spelltext)"></p>
               </div>
               <button *ngIf="!this.editMode" style="background: var(--incoming-chat-bg);border: 0;" type="button"
                 class="clipboard" [cdkCopyToClipboard]="this.spelltext">
@@ -214,11 +222,11 @@
           </div>
 
 
-          <div class="chat incoming" *ngIf="riskflag">
+          <div class="chat outgoing" *ngIf="riskflag">
             <div class="chat-content">
   
               <div class="chat-details">
-                <p>{{this.risktext}}</p>
+                <p [innerHTML]="formatResponse(this.risktext)"></p>
               </div>
               <button *ngIf="!this.editMode" style="background: var(--incoming-chat-bg);border: 0;" type="button"
                 class="clipboard" [cdkCopyToClipboard]="this.risktext">
@@ -246,7 +254,7 @@
         </div>
     
         <div class="typing-controls">
-          <span (click)="toggleEdit()" class="material-symbols-rounded">
+          <span (click)="toggleEdit(); sidenav.toggle();" class="material-symbols-rounded">
             <mat-icon *ngIf="!this.editMode">edit</mat-icon>
             <mat-icon *ngIf="this.editMode">close</mat-icon>
           </span>
@@ -257,10 +265,21 @@
             <mat-icon>delete</mat-icon>
           </span>
           <span *ngIf="this.internetMode" (click)="internetToggle()" class="material-symbols-rounded">
-            <mat-icon>signal_wifi_off</mat-icon>
+            <mat-icon id="wifi"
+            #tooltip="matTooltip"
+            matTooltip="Disable chat with internet"
+            matTooltipPosition="above"
+            matTooltipHideDelay="1" 
+            >wifi</mat-icon>
+  
           </span>
           <span *ngIf="!this.internetMode" (click)="internetToggle()" class="material-symbols-rounded">
-            <mat-icon>signal_wifi_4_bar</mat-icon>
+            <mat-icon
+            #tooltip="matTooltip"
+            matTooltip="Enable chat with internet"
+            matTooltipPosition="above"
+            matTooltipHideDelay="1" 
+            >wifi_off</mat-icon>
           </span>
         </div>
       </div>
