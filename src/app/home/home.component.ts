@@ -60,6 +60,12 @@ export class HomeComponent implements AfterViewInit {
     });
   }
 
+  spellIsTyping: boolean = false;
+  riskIsTyping: boolean = false;
+  risktext!: string;
+  spelltext!: string;
+  spellflag: boolean = false;
+  riskflag: boolean = false;
   internetMode: boolean = false;
   editMode: boolean = false;
   loggedIn: boolean = false;
@@ -90,13 +96,9 @@ export class HomeComponent implements AfterViewInit {
   newc!: boolean;
 
   dataReq: any = {
-    data: this.value,
-    type: "text/markdown",
-    from: "easy",
-    prompt: "text",
+    prompt: this.value,
     conversationId: "",
-    to: "AI",
-    status: "sent"
+    googleId: this.googleId
   };
 
   placeH: string = "You need to login first to be able to prompt...";
@@ -220,14 +222,17 @@ export class HomeComponent implements AfterViewInit {
   getChats() {
     this.apiServe.get_conversations(this.googleId)
       .subscribe((response: any) => {
-        console.log(response);
-        console.log('get_conversations');
+        this.riskflag = false;
+        this.spellflag = false;
+        
         this.takeUsHome(response);
         this.newChat();
       });
   }
 
   changeConv(chat: any) {
+    this.riskflag = false;
+    this.spellflag = false;
     this.aiRes = chat.response;
     this.currentChat = chat;
     this.newc = false;
@@ -236,6 +241,8 @@ export class HomeComponent implements AfterViewInit {
 
   newChat() {
     if (this.loggedIn) {
+      this.riskflag = false;
+      this.spellflag = false;
       this.newc = true;
       this.aiRes = "";
       this.value = "";
@@ -270,6 +277,8 @@ export class HomeComponent implements AfterViewInit {
   }
 
   sendprompt() {
+    this.riskflag = false;
+    this.spellflag = false;
     this.botIsTyping = true;
     var idd = "";
 
@@ -284,7 +293,7 @@ export class HomeComponent implements AfterViewInit {
     this.value = this.temp;
     this.temp = "";
 
-    this.dataReq.data = this.value;
+    this.dataReq.prompt = this.value;
     this.dataReq.conversationId = idd;
     console.log(idd);
     if (this.value != "\n") {
@@ -330,22 +339,28 @@ export class HomeComponent implements AfterViewInit {
   }
 
   risk() {
+    this.riskflag = true;
+    this.riskIsTyping = true;
     this.apiServe.risk({
       conversationId: this.currentChat.id,
       prompt: this.currentChat.response,
     })
       .subscribe((response: any) => {
-        console.log(response);
+        this.riskIsTyping = false;
+        this.risktext = response.response;
       });
   }
 
   spell() {
+    this.spellflag = true;
+    this.spellIsTyping = true;
     this.apiServe.spell({
       conversationId: this.currentChat.id,
       prompt: this.currentChat.response,
     })
       .subscribe((response: any) => {
-        console.log(response);
+        this.spellIsTyping = false;
+        this.spelltext = response.response;
       });
   }
 
@@ -390,6 +405,8 @@ export class HomeComponent implements AfterViewInit {
     this.showLogoutBtn = !this.showLogoutBtn;
   }
   logout() {
+    this.riskflag = false;
+    this.spellflag = false;
     // Perform the logout action, such as calling your authentication service's logout method
     this.authServe.logout();
   
@@ -416,6 +433,8 @@ export class HomeComponent implements AfterViewInit {
   }
   toggleForm() {
     this.formDialog = !this.formDialog;
+    this.riskflag = false;
+    this.spellflag = false;
   }
 
 }

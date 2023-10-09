@@ -114,7 +114,7 @@
         <mat-icon>swap_horiz</mat-icon>
       </button>
     
-      <div *ngIf="this.aiRes">
+      <div *ngIf="this.aiRes || this.value">
     
         <div class="chat incoming" *ngIf="botIsTyping">
           <div class="chat-content">
@@ -164,6 +164,69 @@
                   <mat-icon >content_copy</mat-icon>
                 </span>
             </button>
+          </div>
+        </div>
+
+
+        <div *ngIf="spellflag">
+          <div class="chat incoming" *ngIf="spellIsTyping">
+            <div class="chat-content">
+              <div class="chat-details">
+                <!-- <img src="../../assets/chatbot.jpg" alt="openAi-logo"> -->
+                <div class="typing-animation">
+                  <div class="typing-dot" style="--delay: 0.2s"></div>
+                  <div class="typing-dot" style="--delay: 0.3s"></div>
+                  <div class="typing-dot" style="--delay: 0.4s"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <div class="chat incoming" *ngIf="spellflag">
+            <div class="chat-content">
+  
+              <div class="chat-details">
+                <p>{{this.spelltext}}</p>
+              </div>
+              <button *ngIf="!this.editMode" style="background: var(--incoming-chat-bg);border: 0;" type="button"
+                class="clipboard" [cdkCopyToClipboard]="this.spelltext">
+                <span class="material-symbols-rounded">
+                  <mat-icon >content_copy</mat-icon>
+                </span>
+            </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="riskflag">
+
+          <div class="chat incoming" *ngIf="riskIsTyping">
+            <div class="chat-content">
+              <div class="chat-details">
+                <!-- <img src="../../assets/chatbot.jpg" alt="openAi-logo"> -->
+                <div class="typing-animation">
+                  <div class="typing-dot" style="--delay: 0.2s"></div>
+                  <div class="typing-dot" style="--delay: 0.3s"></div>
+                  <div class="typing-dot" style="--delay: 0.4s"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="chat incoming" *ngIf="riskflag">
+            <div class="chat-content">
+  
+              <div class="chat-details">
+                <p>{{this.risktext}}</p>
+              </div>
+              <button *ngIf="!this.editMode" style="background: var(--incoming-chat-bg);border: 0;" type="button"
+                class="clipboard" [cdkCopyToClipboard]="this.risktext">
+                <span class="material-symbols-rounded">
+                  <mat-icon >content_copy</mat-icon>
+                </span>
+            </button>
+            </div>
           </div>
         </div>
     
