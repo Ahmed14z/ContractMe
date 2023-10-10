@@ -52,8 +52,23 @@ export class ApiService {
 
   internet(data: any): Observable<any> {
     var headers = new HttpHeaders({'Content-Type':'application/json'});
-
-    console.log(data);
     return this.http.post('https://contractgptbackend-production.up.railway.app/chat-internet', JSON.stringify(data), { headers});
   }
+
+  delete(data: any): Observable<any> {
+    const options = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      body: data,
+    };
+    return this.http.delete('https://contractgptbackend-production.up.railway.app/delete', options);
+  }
+
+  deleteConv(data: any): Observable<any> {
+    const options = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      body: data,
+    };
+    return this.http.delete('https://contractgptbackend-production.up.railway.app/delete-conv', options);
+  }
+
 }

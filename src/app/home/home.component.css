@@ -30,6 +30,7 @@
 .chat-container .chat.incoming {
   background: var(--incoming-chat-bg);
   border: 1px solid var(--incoming-chat-border);
+  margin-bottom: 25px;
 }
 .chat .chat-content {
   display: flex;
@@ -173,7 +174,7 @@ span.material-symbols-rounded {
   resize: none;
   border-radius: 4px;
   font-size: 1rem;
-  padding: 15px 45px 15px 20px;
+  padding: 15px 45px 15px 60px;
   color: var(--text-color);
   background: var(--incoming-chat-bg);
   outline: 1px solid var(--incoming-chat-border);
@@ -198,7 +199,15 @@ span.material-symbols-rounded {
   justify-content: center;
   color: var(--icon-color);
 }
-
+#add {
+  color: var(--outgoing-chat-bg);
+  background: var(--icon-color);
+  border-radius: 50%;
+  position: absolute;
+  right: 1280%;
+  bottom: 30%;
+  visibility: visible;
+}
 
 .typing-textarea button {
   position: absolute;
@@ -299,22 +308,41 @@ mat-sidenav {
 #chatHistory ul {
   height: 100%;
   margin-left: -7px;
+  
+  position: relative;
 }
 #chatHistory li {
   cursor: pointer;
-  padding: 5px;
-  padding-right: 10px;
-  height: 35px;
+  padding: 10px;
+  height: 40px;
   border: 1px solid var(--incoming-chat-border);
   border-radius: 8px;
-  overflow: hidden;
   margin-left: 7px;
   margin-right: 7px;
   margin-top: 5px;
+  overflow: hidden;
+
 }
 #chatHistory li:hover {
   background: var(--incoming-chat-bg);
 }
+#chatHistory li p {
+  width: 85%;
+  overflow: hidden;
+  margin-right: 10px;
+}
+#chatHistory li div {
+  color: var(--icon-color);
+  position: absolute;
+  left: 85%;
+  width: 8%;
+  height: 6%;
+}
+#chatHistory li div:hover {
+  color: var(--text-color);
+  background: var(--outgoing-chat-bg);
+}
+
 #googleBtn {
   height: 14vh;
   width: 23%;
@@ -323,7 +351,7 @@ mat-sidenav {
   border-left: 0;
   border-right: 0;
   position: fixed;
-  top: 85%;
+  top: 87%;
 }
 #loginBtn {
   position: absolute;
@@ -334,7 +362,7 @@ mat-sidenav {
 }
 mat-sidenav-container mat-sidenav #chatHistory {
   margin-top: 5px;
-  height: 69vh;
+  height: 70vh;
   overflow: scroll;
   scroll-behavior: smooth;
   /* border: 1px solid var(--incoming-chat-border); */
@@ -498,4 +526,9 @@ strong {
 }
 #wifi {
   color: #2ecc71;
+}
+.cntr {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

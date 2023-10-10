@@ -60,6 +60,9 @@ export class HomeComponent implements AfterViewInit {
     });
   }
 
+  showFormResponse: boolean = false;
+  sideNav: boolean = true;
+  signatureText: string = "";
 
   spellIsTyping: boolean = false;
   riskIsTyping: boolean = false;
@@ -68,6 +71,7 @@ export class HomeComponent implements AfterViewInit {
   spellflag: boolean = false;
   riskflag: boolean = false;
   internetMode: boolean = false;
+
   editMode: boolean = false;
   loggedIn: boolean = false;
   showLogoutBtn: boolean = false;
@@ -106,6 +110,7 @@ export class HomeComponent implements AfterViewInit {
 
   // Signing Form Dialog
   formDialog: boolean = false;
+  signer1!: string;
   signer2!: string;
   title!: string;
   subject!: string;
@@ -197,6 +202,12 @@ export class HomeComponent implements AfterViewInit {
   //   this.currentChat = chat;
   // }
 
+  deleteBtn(chat: any) {
+    this.deleteConv(chat);
+    this.delete(chat);
+    this.getChats();
+  }
+
   formatResponse(response: string): string {
     // Use a regular expression to find text between ** **
     return response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -212,6 +223,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   takeUsHome(data: any) {
+    this.wholeChat = [];
     for (const key in data) {
       if (data.hasOwnProperty(key)) {
         const array = data[key];
@@ -222,6 +234,22 @@ export class HomeComponent implements AfterViewInit {
           response: lastElement
         });
       }
+    }
+  }
+
+  newChat() {
+    if (this.loggedIn) {
+      this.riskflag = false;
+      this.spellflag = false;
+      this.newc = true;
+      this.aiRes = "";
+      this.value = "";
+      this.temp = "";
+      this.currentChat = {
+        googleId: this.googleId,
+        id: "",
+        response: ""
+      };
     }
   }
 
@@ -245,22 +273,6 @@ export class HomeComponent implements AfterViewInit {
     
 
     // Make a new class to make the current chat looks like the chat we clicked on
-  }
-
-  newChat() {
-    if (this.loggedIn) {
-      this.riskflag = false;
-      this.spellflag = false;
-      this.newc = true;
-      this.aiRes = "";
-      this.value = "";
-      this.temp = "";
-      this.currentChat = {
-        googleId: this.googleId,
-        id: "",
-        response: ""
-      };
-    }
   }
 
   updateChat(word: string) {
@@ -376,6 +388,23 @@ export class HomeComponent implements AfterViewInit {
       });
   }
 
+  deleteConv(chat: any) {
+    this.apiServe.deleteConv({conversationId: chat.id}).subscribe((response: any) => {
+      console.log(response);
+      this.wholeChat = this.wholeChat;
+    });
+  }
+  delete(chat: any) {
+    this.apiServe.delete({conversationId: chat.id}).subscribe((response: any) => {
+      console.log(response);
+      this.wholeChat = this.wholeChat;
+    });
+  }
+
+  uploadText() {
+    console.log('uploading text');
+  }
+
   /////////////////////////////////////////////////
 
   deleteVal() {
@@ -394,10 +423,12 @@ export class HomeComponent implements AfterViewInit {
   
   log(state: any) {
     if(state == "opened") {
-      this.hideIcon()
+      this.hideIcon();
+      this.sideNav = true;
     }
     else {
-      this.showIcon()
+      this.showIcon();
+      this.sideNav = false;
     }
   }
 
@@ -430,23 +461,34 @@ export class HomeComponent implements AfterViewInit {
   }
 
   sendSign() {
+    const btn = document.getElementsByClassName('bttn')[0];
+    btn.innerHTML = "Sending...";
     this.apiServe.sign({
-      signer_1_email: this.email,
+      signer_1_email: this.signer1,
       signer_2_email: this.signer2,
       title: this.title,
       subject: this.subject,
       message: this.message,
-      cc: this.cc,
+      cc_email_addresses: this.cc,
       chat: this.currentChat.response,
     })
       .subscribe((response: any) => {
         console.log(response);
+        console.log(response.status);
+        this.showFormResponse = true;
+        if(response.status == 200) {
+          this.signatureText = "Check your email to sign the document!"
+        }
+        else {
+          this.signatureText = "Something went wrong, please try again!"
+        }
       });
   }
   toggleForm() {
     this.formDialog = !this.formDialog;
     this.riskflag = false;
     this.spellflag = false;
+    this.showFormResponse = false;
   }
 
 }
