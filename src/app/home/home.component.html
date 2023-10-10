@@ -151,6 +151,33 @@
       <button id="toggle1" (click)="sidenav.toggle()">
         <mat-icon>chevron_right</mat-icon>
       </button>
+
+      <div *ngIf="!this.aiRes && !this.value && this.loggedIn">
+
+        <div class="templates">
+          <div class="template">
+            <div (click)="carContract()" class="temp">
+              <h4>Car Contract</h4>
+              <p>Solid car contract with today's date</p>
+            </div>
+            <div (click)="realStateContract()" class="temp">
+              <h4>Realestate Contract</h4>
+              <p>Solid realestate contract with today's date</p>
+            </div>
+          </div>
+          <div class="template">
+            <div (click)="employmentContract()" class="temp">
+              <h4>Employment Contract</h4>
+              <p>Solid employment contract with today's date</p>
+            </div>
+            <div (click)="businessSellingContract()" class="temp">
+              <h4>Selling Business Contract</h4>
+              <p>Solid business selling contract with today's date</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     
       <div *ngIf="this.aiRes || this.value">
     

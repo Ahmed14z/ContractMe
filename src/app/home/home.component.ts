@@ -63,6 +63,8 @@ export class HomeComponent implements AfterViewInit {
     });
   }
 
+  templates: boolean = false;
+
   customApi: string = "";
   customApiFlag: boolean = false;
   upload: boolean = false;
@@ -123,6 +125,35 @@ export class HomeComponent implements AfterViewInit {
   message!: string;
   cc: string[] = ["", ""];
 
+
+  businessSellingContract() {
+    this.internetMode = true;
+    this.templates = true;
+    this.value = "check google for today's exact date , give me a Business selling contract TEMPLATE with the date in it , and make the contract real with example prices , search latest Business selling contracts how are they made today legally and respond with the contract only with today's date filled inside it , reply with the contract only without you talking as a tool. "
+    this.sendprompt();
+  }
+
+  employmentContract() {
+    this.internetMode = true;
+    this.templates = true;
+    this.value = "check google for today's exact date , give me a Employment contract TEMPLATE with the date in it , and make the contract real with example prices , search latest Employment contracts how are they made today legally and respond with the contract only with today's date filled inside it , reply with the contract only without you talking as a tool. "
+    this.sendprompt();
+  }
+
+  realStateContract() {
+    this.internetMode = true;
+    this.templates = true;
+    this.value = "check google for today's exact date , give me a realestate selling contract TEMPLATE with the date in it , and make the contract real with example prices , search latest realestate contracts how are they made today legally and respond with the contract only with today's date filled inside it , reply with the contract only without you talking as a tool."
+    this.sendprompt();
+  }
+
+  carContract() {
+    this.internetMode = true;
+    this.templates = true;
+    this.value = "check google for today's exact date , give me a car selling contract TEMPLATE with the date in it , and make the contract real with example prices , search latest car contracts how are they made today legally and respond with the contract only with today's date filled inside it , reply with the contract only without you talking as a tool.";
+    this.sendprompt();
+  }
+
   toggleSetting() {
     this.customApiFlag = !this.customApiFlag;
   }
@@ -179,7 +210,7 @@ export class HomeComponent implements AfterViewInit {
       this.newc = true;
       this.aiRes = "";
       this.value = "";
-      this.temp = "";
+
       this.currentChat = {
         googleId: this.googleId,
         id: "",
@@ -211,8 +242,8 @@ export class HomeComponent implements AfterViewInit {
   }
 
   updateChat(word: string) {
-    if (!this.upload) {
       this.currentChat.response = word;
+      this.botIsTyping = false;
       this.aiRes = word;
 
       var indexToUpdate = this.wholeChat.findIndex(obj => obj.id === this.currentChat.id);
@@ -232,36 +263,14 @@ export class HomeComponent implements AfterViewInit {
             this.toggleEdit();
           }
         });
-    }
-    else {
-      this.upload = false; 
-
-      this.currentChat.response = this.aiRes;
-
-      var indexToUpdate = this.wholeChat.findIndex(obj => obj.id === this.currentChat.id);
-
-      if (indexToUpdate !== -1) {
-        // Replace the object at the specific index with the updated object
-        this.wholeChat[indexToUpdate].response = this.currentChat.response;
-      }
-      
-      this.apiServe.update({
-        google_id: this.googleId,
-        conv_id: this.currentChat.id,
-        response: this.currentChat.response,
-      })
-        .subscribe((response: any) => {
-          if (this.editMode) {
-            this.toggleEdit();
-          }
-        });
-    }
+      this.upload = false;
+      this.templates = false;
   }
 
   sendprompt() {
     this.riskflag = false;
     this.spellflag = false;
-    this.botIsTyping = !this.upload;
+    this.botIsTyping = true;
     var idd = "";
 
     if (this.currentChat.id == "") {
@@ -272,7 +281,7 @@ export class HomeComponent implements AfterViewInit {
       this.newc = false;
     }
 
-    this.value = (!this.upload)? this.temp: this.aiRes;
+    this.value = (!this.upload && !this.templates)? this.temp: this.value;
     this.temp = "";
 
     this.dataReq.prompt = this.value;
@@ -286,31 +295,57 @@ export class HomeComponent implements AfterViewInit {
         if (!this.internetMode) {
           this.apiServe.send(this.dataReq).subscribe((response: any) => {
             this.currentChat.id = idd;
-  
-            this.updateChat(response.response);
-            this.botIsTyping = false;
-            this.autoScrollToBottom();
-            
-            if(this.newc) {
-              this.wholeChat.push(this.currentChat);
-              // Make a new class to make the current chat looks like the chat we clicked on
-  
+            if (this.upload) {
+              this.updateChat(this.value);
+              
+              this.autoScrollToBottom();
+              
+              if(this.newc) {
+                this.wholeChat.push(this.currentChat);
+                // Make a new class to make the current chat looks like the chat we clicked on
+    
+              }
             }
+            else {
+              this.updateChat(response.response);
+              
+              this.autoScrollToBottom();
+              
+              if(this.newc) {
+                this.wholeChat.push(this.currentChat);
+                // Make a new class to make the current chat looks like the chat we clicked on
+    
+              }
+            }
+            
           });
         }
         else {
           this.apiServe.internet(this.dataReq).subscribe((response: any) => {
             this.currentChat.id = idd;
-  
-            this.updateChat(response.response);
-            this.botIsTyping = false;
-            this.autoScrollToBottom();
-            
-            if(this.newc) {
-              this.wholeChat.push(this.currentChat);
-              // Make a new class to make the current chat looks like the chat we clicked on
-  
+            if (this.upload) {
+              this.updateChat(this.value);
+              
+              this.autoScrollToBottom();
+              
+              if(this.newc) {
+                this.wholeChat.push(this.currentChat);
+                // Make a new class to make the current chat looks like the chat we clicked on
+    
+              }
             }
+            else {
+              this.updateChat(response.response);
+              
+              this.autoScrollToBottom();
+              
+              if(this.newc) {
+                this.wholeChat.push(this.currentChat);
+                // Make a new class to make the current chat looks like the chat we clicked on
+    
+              }
+            }
+            
           });
         }
 
@@ -346,14 +381,12 @@ export class HomeComponent implements AfterViewInit {
 
   deleteConv(chat: any) {
     this.apiServe.deleteConv({conversationId: chat.id}).subscribe((response: any) => {
-      console.log(response);
       this.wholeChat = this.wholeChat;
     });
   }
 
   delete(chat: any) {
     this.apiServe.delete({conversationId: chat.id}).subscribe((response: any) => {
-      console.log(response);
       this.wholeChat = this.wholeChat;
     });
   }
@@ -380,7 +413,7 @@ export class HomeComponent implements AfterViewInit {
             // Handle the response from the backend here
             if (response && response.text) {
               // Assuming that the response is in JSON format and has a "text" property
-              this.aiRes = response.text; // Update aiRes with the response text
+              this.value = response.text; // Update aiRes with the response text
 
               this.sendprompt();
             } else {
@@ -403,7 +436,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   toggleEdit() {
-    this.editMode = !this.editMode;
+    this.editMode = (this.aiRes)?!this.editMode: this.editMode;
   }
 
   ngAfterViewInit() {
