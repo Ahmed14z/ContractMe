@@ -6,12 +6,14 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import { ViewChild, ElementRef, AfterViewChecked, AfterViewInit } from '@angular/core';
 import { Subject } from 'rxjs/internal/Subject';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
+
 export class HomeComponent implements AfterViewInit {
   @ViewChild('chatContainer') chatContainer: ElementRef | null = null;
   private unsubscribe$ = new Subject<void>();
@@ -20,6 +22,7 @@ export class HomeComponent implements AfterViewInit {
     private apiServe: ApiService,
     public authServe: AuthService,
     private router: Router,
+    private httpClient: HttpClient,
     @Inject(DOCUMENT) public document: Document
   ) {
     // Check if the user is authenticated when the component is constructed
@@ -60,6 +63,9 @@ export class HomeComponent implements AfterViewInit {
     });
   }
 
+  customApi: string = "";
+  customApiFlag: boolean = false;
+  upload: boolean = false;
   showFormResponse: boolean = false;
   sideNav: boolean = true;
   signatureText: string = "";
@@ -116,91 +122,20 @@ export class HomeComponent implements AfterViewInit {
   subject!: string;
   message!: string;
   cc: string[] = ["", ""];
-  addCc: boolean = false;
+
+  toggleSetting() {
+    this.customApiFlag = !this.customApiFlag;
+  }
 
   autoScrollToBottom() {
     // Scroll to the bottom of the chat container
     if (this.chatContainer)
       this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight;
   }
+
   set promptVal(value: string) {
     this.temp = value;
   }
-
-  // pushingChat(id: any) {
-  //   let onechat = {
-  //     googleId: this.googleId,
-  //     id: id,
-  //     // request: this.value,
-  //     response: this.aiRes
-  //   }
-  //   this.currentChat = onechat;
-  //   this.wholeChat.push(onechat);
-  // }
-  // generateUniqueId() {
-  //   const timestamp = Date.now();
-  //   return `chat_${timestamp}`;
-  // }
-  // newChat() {
-  //   this.aiRes = "";
-  //   this.value = "";
-  //   this.temp = "";
-  //   if (this.currentChat.response != "") {
-  //     this.pushingChat(this.generateUniqueId());
-  //   }
-  // }
-  // updateChat(word: string) {
-  //   var objectToUpdate = this.wholeChat.find(obj => obj.request === this.currentChat.request);
-  //   this.currentChat.response = word;
-  //   objectToUpdate.response = word;
-
-  //   var indexToUpdate = this.wholeChat.findIndex(obj => obj.request === this.currentChat.request);
-
-  //   if (indexToUpdate !== -1) {
-  //     // Replace the object at the specific index with the updated object
-  //     this.wholeChat[indexToUpdate].response = this.currentChat.response;
-  //   }
-  //   console.log(this.wholeChat);
-  // }
-  // sendprompt() {
-  //   var idd = (this.currentChat.id != "")? this.currentChat.id: this.generateUniqueId();
-
-  //   this.botIsTyping = true;
-  //   this.value = this.temp;
-  //   this.temp = "";
-  //   this.dataReq.data = this.value;
-  //   this.dataReq.conversationId = idd;
-  //   console.log(this.dataReq.conversationId);
-  //   console.log(this.currentChat)
-    
-  //   if (this.value != "\n") {
-  //     if (this.value != "") {
-  //       this.apiServe.send(this.dataReq).subscribe((response: any) => {
-  //         console.log(response);
-
-  //         this.aiRes = response.response;
-  //         // if (this.wholeChat.length == 1) {
-  //         //   this.pushingChat(idd);
-  //         // }
-  //         // else {
-  //         //   this.currentChat.response = response.response;
-  //         //   this.currentChat.id = idd;
-  //         //   this.currentChat.googleId = this.googleId;
-  //         // }
-  //         this.currentChat.id = idd;
-  //         this.currentChat.googleId = this.googleId;
-  //         this.updateChat(response.response);
-  //         this.botIsTyping = false;
-  //         this.autoScrollToBottom();
-  //       });
-
-  //     }
-  //   }
-  // }
-  // changeConv(chat: any) {
-  //   this.aiRes = chat.response;
-  //   this.currentChat = chat;
-  // }
 
   deleteBtn(chat: any) {
     this.deleteConv(chat);
@@ -276,32 +211,57 @@ export class HomeComponent implements AfterViewInit {
   }
 
   updateChat(word: string) {
-    this.currentChat.response = word;
-    this.aiRes = word;
+    if (!this.upload) {
+      this.currentChat.response = word;
+      this.aiRes = word;
 
-    var indexToUpdate = this.wholeChat.findIndex(obj => obj.id === this.currentChat.id);
+      var indexToUpdate = this.wholeChat.findIndex(obj => obj.id === this.currentChat.id);
 
-    if (indexToUpdate !== -1) {
-      // Replace the object at the specific index with the updated object
-      this.wholeChat[indexToUpdate].response = this.currentChat.response;
+      if (indexToUpdate !== -1) {
+        // Replace the object at the specific index with the updated object
+        this.wholeChat[indexToUpdate].response = this.currentChat.response;
+      }
+      
+      this.apiServe.update({
+        google_id: this.googleId,
+        conv_id: this.currentChat.id,
+        response: word,
+      })
+        .subscribe((response: any) => {
+          if (this.editMode) {
+            this.toggleEdit();
+          }
+        });
     }
-    
-    this.apiServe.update({
-      google_id: this.googleId,
-      conv_id: this.currentChat.id,
-      response: word,
-    })
-      .subscribe((response: any) => {
-        if (this.editMode) {
-          this.toggleEdit();
-        }
-      });
+    else {
+      this.upload = false; 
+
+      this.currentChat.response = this.aiRes;
+
+      var indexToUpdate = this.wholeChat.findIndex(obj => obj.id === this.currentChat.id);
+
+      if (indexToUpdate !== -1) {
+        // Replace the object at the specific index with the updated object
+        this.wholeChat[indexToUpdate].response = this.currentChat.response;
+      }
+      
+      this.apiServe.update({
+        google_id: this.googleId,
+        conv_id: this.currentChat.id,
+        response: this.currentChat.response,
+      })
+        .subscribe((response: any) => {
+          if (this.editMode) {
+            this.toggleEdit();
+          }
+        });
+    }
   }
 
   sendprompt() {
     this.riskflag = false;
     this.spellflag = false;
-    this.botIsTyping = true;
+    this.botIsTyping = !this.upload;
     var idd = "";
 
     if (this.currentChat.id == "") {
@@ -312,7 +272,7 @@ export class HomeComponent implements AfterViewInit {
       this.newc = false;
     }
 
-    this.value = this.temp;
+    this.value = (!this.upload)? this.temp: this.aiRes;
     this.temp = "";
 
     this.dataReq.prompt = this.value;
@@ -325,8 +285,6 @@ export class HomeComponent implements AfterViewInit {
 
         if (!this.internetMode) {
           this.apiServe.send(this.dataReq).subscribe((response: any) => {
-            console.log(response);
-            console.log('/chat');
             this.currentChat.id = idd;
   
             this.updateChat(response.response);
@@ -342,8 +300,6 @@ export class HomeComponent implements AfterViewInit {
         }
         else {
           this.apiServe.internet(this.dataReq).subscribe((response: any) => {
-            console.log(response);
-            console.log(this.dataReq);
             this.currentChat.id = idd;
   
             this.updateChat(response.response);
@@ -394,6 +350,7 @@ export class HomeComponent implements AfterViewInit {
       this.wholeChat = this.wholeChat;
     });
   }
+
   delete(chat: any) {
     this.apiServe.delete({conversationId: chat.id}).subscribe((response: any) => {
       console.log(response);
@@ -401,12 +358,46 @@ export class HomeComponent implements AfterViewInit {
     });
   }
 
-  uploadText() {
-    console.log('uploading text');
+  uploadText(event: Event): void {
+    this.upload = true
+    const target = event.target as HTMLInputElement;
+    if (target && target.files) {
+      const files = target.files;
+      if (files.length > 0) {
+        const formData = new FormData();
+  
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          console.log(`Uploading text from file: ${file.name}`);
+          // Append the file to the form data
+          formData.append('file', file, file.name);
+        }
+  
+        // Send the form data to the backend
+        this.httpClient.post('https://contractgptbackend-production.up.railway.app/convert', formData).subscribe(
+          (response: any) => {
+            console.log('File uploaded successfully:', response);
+            // Handle the response from the backend here
+            if (response && response.text) {
+              // Assuming that the response is in JSON format and has a "text" property
+              this.aiRes = response.text; // Update aiRes with the response text
+
+              this.sendprompt();
+            } else {
+              this.aiRes = "Invalid response format"; // Handle the case where the response is not as expected
+            }
+            this.autoScrollToBottom(); // Scroll to the bottom of the chat container
+          },
+          (error) => {
+            console.error('Error uploading file:', error);
+            // Handle the error here
+            this.upload = false;
+          }
+        );
+      }
+    }
   }
-
-  /////////////////////////////////////////////////
-
+  
   deleteVal() {
     this.temp = "";
   }
@@ -447,6 +438,7 @@ export class HomeComponent implements AfterViewInit {
   showLogout() {
     this.showLogoutBtn = !this.showLogoutBtn;
   }
+
   logout() {
     this.riskflag = false;
     this.spellflag = false;
@@ -471,6 +463,7 @@ export class HomeComponent implements AfterViewInit {
       message: this.message,
       cc_email_addresses: this.cc,
       chat: this.currentChat.response,
+      api: this.customApi
     })
       .subscribe((response: any) => {
         console.log(response);
@@ -484,11 +477,13 @@ export class HomeComponent implements AfterViewInit {
         }
       });
   }
+
   toggleForm() {
     this.formDialog = !this.formDialog;
     this.riskflag = false;
     this.spellflag = false;
     this.showFormResponse = false;
   }
+
 
 }

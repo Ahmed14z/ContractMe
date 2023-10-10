@@ -204,7 +204,7 @@ span.material-symbols-rounded {
   background: var(--icon-color);
   border-radius: 50%;
   position: absolute;
-  right: 1280%;
+  right: 1150%;
   bottom: 30%;
   visibility: visible;
 }
@@ -269,16 +269,19 @@ mat-sidenav {
   background: var(--outgoing-chat-bg);
 }
 #toggle1 {
+  border-bottom-right-radius: 40%;
   cursor: pointer;
   color: white;
   border: 0;
-  background: rgba(0, 0, 0, 0);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 5px 5px 5px;
 }
 #toggle2 {
+  border-bottom-right-radius: 40%;
   cursor: pointer;
   color: white;
   border: 0;
-  background: rgba(0, 0, 0, 0);
+  background: rgba(255, 255, 255, 0.2);
   /* border: 1px solid var(--incoming-chat-border);
   border-radius: 4px; */
   padding: 3px 5px 3px 5px;

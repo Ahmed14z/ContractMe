@@ -20,7 +20,6 @@ export class ApiService {
 
   send(data: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    console.log(data);
     return this.http.post('https://contractgptbackend-production.up.railway.app/chat', JSON.stringify(data), { headers});
   } 
 
@@ -36,6 +35,7 @@ export class ApiService {
   }
 
   update(data: any): Observable<any> {
+    console.log(data);
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post('https://contractgptbackend-production.up.railway.app/update', JSON.stringify(data), { headers});
   }
@@ -71,4 +71,8 @@ export class ApiService {
     return this.http.delete('https://contractgptbackend-production.up.railway.app/delete-conv', options);
   }
 
+  // convertText(text: any): Observable<any> {
+
+  //   return this.htpp.post('https://contractgptbackend-production.up.railway.app/convert', text);
+  // }
 }

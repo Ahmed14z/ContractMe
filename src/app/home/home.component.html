@@ -1,4 +1,7 @@
+
+
 <mat-sidenav-container>
+  
   <mat-sidenav #sidenav opened (opened)="log('opened')" (closed)="log('closed')" mode="side">
 
     <div id="sideNavbar">
@@ -7,7 +10,7 @@
       <div id="side">
         <p (click)="newChat()">+ New Chat</p>
         <button id="toggle2" (click)="sidenav.toggle()">
-          <mat-icon>swap_horiz</mat-icon>
+          <mat-icon>chevron_left</mat-icon>
         </button>
       </div>
 
@@ -64,6 +67,25 @@
     
     <div id="chat-container" class="chat-container"  #chatContainer>
 
+      <div id="dialog-box" *ngIf="customApiFlag">
+        <div class="wrapper">
+          
+          <form class="form-signin">
+            <div class="x">
+              <button type="button" mat-button (click)="toggleSetting()"><span class="material-symbols-rounded">
+                <mat-icon >close</mat-icon>
+              </span></button>
+            </div>
+
+            <div>
+              <label for="api">DropBox Api</label><br>
+              <input type="text" class="form-control" name="api" id="api" [(ngModel)]="customApi" placeholder="YOUR API KEY" required/>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
       <p *ngIf="this.showFormResponse" style="color: rgb(15, 16, 18); text-align: center;">{{signatureText}}</p>
 
       <div id="dialog-box" *ngIf="this.formDialog && !this.showFormResponse">
@@ -119,7 +141,7 @@
             
             <div class="x">
               
-              <button class="bttn" [disabled]="disabled" type="submit">Send E-Signature</button>
+              <button class="bttn" type="submit">Send E-Signature</button>
             </div>
           </form>
         </div>
@@ -127,7 +149,7 @@
 
       
       <button id="toggle1" (click)="sidenav.toggle()">
-        <mat-icon>swap_horiz</mat-icon>
+        <mat-icon>chevron_right</mat-icon>
       </button>
     
       <div *ngIf="this.aiRes || this.value">
@@ -263,7 +285,8 @@
           </span>
 
           <span class="material-symbols-rounded">
-            <mat-icon (click)="uploadText()" id="add">add</mat-icon>
+            <mat-icon (click)="fileInput.click()" id="add">add</mat-icon>
+            <input type="file" #fileInput (change)="uploadText($event)" [style.display]="'none'" multiple>
           </span>
 
         </div>
@@ -273,28 +296,40 @@
             <mat-icon *ngIf="!this.editMode">edit</mat-icon>
             <mat-icon *ngIf="this.editMode">close</mat-icon>
           </span>
+
           <span  *ngIf="this.editMode" (click)="updateChat(this.aiRes)" class="material-symbols-rounded">
             <mat-icon>save</mat-icon>
           </span>
+
           <span (click)="deleteVal()" class="material-symbols-rounded">
             <mat-icon>delete</mat-icon>
           </span>
+
           <span *ngIf="this.internetMode" (click)="internetToggle()" class="material-symbols-rounded">
             <mat-icon id="wifi"
-            #tooltip="matTooltip"
-            matTooltip="Disable chat with internet"
-            matTooltipPosition="above"
-            matTooltipHideDelay="1" 
+              #tooltip="matTooltip"
+              matTooltip="Disable chat with internet"
+              matTooltipPosition="above"
+              matTooltipHideDelay="1" 
             >wifi</mat-icon>
-  
           </span>
+
           <span *ngIf="!this.internetMode" (click)="internetToggle()" class="material-symbols-rounded">
             <mat-icon
-            #tooltip="matTooltip"
-            matTooltip="Enable chat with internet"
-            matTooltipPosition="above"
-            matTooltipHideDelay="1" 
+              #tooltip="matTooltip"
+              matTooltip="Enable chat with internet"
+              matTooltipPosition="above"
+              matTooltipHideDelay="1" 
             >wifi_off</mat-icon>
+          </span>
+
+          <span (click)="toggleSetting()" class="material-symbols-rounded">
+            <mat-icon
+              #tooltip="matTooltip"
+              matTooltip="Api Key Input"
+              matTooltipPosition="above"
+              matTooltipHideDelay="1" 
+            >settings</mat-icon>
           </span>
         </div>
       </div>
